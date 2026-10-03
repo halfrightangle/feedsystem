@@ -1,0 +1,54 @@
+# ===== Go 编译产物 =====
+*.exe
+*.exe~
+*.dll
+*.dylib
+*.test
+*.out
+/bin/
+/dist/
+
+# ===== Node.js =====
+node_modules/
+dist/
+build/
+
+# ===== 编辑器 =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== 环境变量（含密码）=====
+.env
+.env.*
+!.env.example
+
+# ===== 日志 =====
+*.log
+/logs/
+
+# ===== 依赖 =====
+/vendor/
+
+# ===== 测试覆盖率 =====
+coverage/
+*.cover
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+
+# ===== 临时文件 =====
+/tmp/
+*.tmp
+
+# ===== AI 工具 =====
+.claude/
+
+# ===== Docker 数据卷 =====
+/data/
+
+# ===== 运行时上传文件 =====
+/backend/.run/uploads/
