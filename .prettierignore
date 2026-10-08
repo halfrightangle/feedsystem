@@ -1,0 +1,25 @@
+# 依赖与构建产物
+node_modules/
+dist/
+build/
+coverage/
+.output/
+.cache/
+.parcel-cache/
+.vite/
+
+# 锁文件（机器生成，不格式化）
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# 运行时数据
+/data/
+/backend/.run/
+
+# 压缩文件与日志（机器生成）
+*.min.*
+*.log
+
+# 文档（如不想让 Prettier 重排 Markdown/表格，取消下一行注释）
+# *.md
