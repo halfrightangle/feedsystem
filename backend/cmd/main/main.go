@@ -3,18 +3,31 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+
+	"feedsystem/internal/config"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.Default()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Printf("invalid configuration: %v", err)
+		os.Exit(1)
+	}
 
+	gin.SetMode(cfg.Server.Mode)
+
+	r := gin.Default()
 	r.GET("/ping", ping)
 
-	log.Println("starting server on :8080")
-	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("server exited: %v", err)
+	log.Printf("starting server addr=%s env=%s gin_mode=%s",
+		cfg.Addr(), cfg.Env, cfg.Server.Mode)
+
+	if err := r.Run(cfg.Addr()); err != nil {
+		log.Printf("server exited: %v", err)
+		os.Exit(1)
 	}
 }
 
