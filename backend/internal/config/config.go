@@ -2,17 +2,24 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"strconv"
 )
 
 type Config struct {
 	Env    string
 	Server Server
+	Log    Log
 }
 
 type Server struct {
 	Port int
 	Mode string
+}
+
+type Log struct {
+	Level  slog.Level
+	Format string
 }
 
 func (c Config) Addr() string { return ":" + strconv.Itoa(c.Server.Port) }
@@ -36,6 +43,12 @@ func (c Config) validate() []error {
 	case "debug", "release", "test":
 	default:
 		errs = append(errs, fmt.Errorf("server.mode 只能是 debug、release 或 test，当前是 %q", c.Server.Mode))
+	}
+
+	switch c.Log.Format {
+	case "text", "json":
+	default:
+		errs = append(errs, fmt.Errorf("log.format 只能是 text 或 json，当前是 %q", c.Log.Format))
 	}
 
 	return errs

@@ -5,7 +5,7 @@
 #   代码默认值  <  本文件  <  .env  <  真实环境变量
 
 # 运行环境：development / production
-# 它会决定下面 server.mode 的默认值。
+# 它会决定下面 server.mode / log.level / log.format 的默认值。
 env: development
 
 server:
@@ -14,3 +14,11 @@ server:
   # Gin 运行模式：debug / release
   # 不写就跟着 env 走：开发=debug，生产=release
   # mode: debug
+
+log:
+  # 日志级别：debug / info / warn / error
+  # 不写就跟着 env 走：开发=debug，生产=info
+  # level: debug
+  # 日志格式：text / json
+  # 不写就跟着 env 走：开发=text，生产=json
+  # format: text

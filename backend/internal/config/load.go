@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
@@ -15,11 +17,17 @@ const defaultConfigPath = "configs/config.yaml"
 type fileConfig struct {
 	Env    string     `yaml:"env"`
 	Server fileServer `yaml:"server"`
+	Log    fileLog    `yaml:"log"`
 }
 
 type fileServer struct {
 	Port int    `yaml:"port"`
 	Mode string `yaml:"mode"`
+}
+
+type fileLog struct {
+	Level  string `yaml:"level"`
+	Format string `yaml:"format"`
 }
 
 func Load() (Config, error) {
@@ -38,9 +46,9 @@ func Load() (Config, error) {
 
 	cfg.Server.Port = 8080
 	if cfg.IsProduction() {
-		cfg.Server.Mode = "release"
+		cfg.Server.Mode, cfg.Log.Format, cfg.Log.Level = "release", "json", slog.LevelInfo
 	} else {
-		cfg.Server.Mode = "debug"
+		cfg.Server.Mode, cfg.Log.Format, cfg.Log.Level = "debug", "text", slog.LevelDebug
 	}
 
 	var errs []error
@@ -51,9 +59,29 @@ func Load() (Config, error) {
 	if fc.Server.Mode != "" {
 		cfg.Server.Mode = fc.Server.Mode
 	}
+	if fc.Log.Format != "" {
+		cfg.Log.Format = fc.Log.Format
+	}
+	if fc.Log.Level != "" {
+		if lv, err := parseLevel(path+" 的 log.level", fc.Log.Level); err != nil {
+			errs = append(errs, err)
+		} else {
+			cfg.Log.Level = lv
+		}
+	}
 
 	if v := os.Getenv("GIN_MODE"); v != "" {
 		cfg.Server.Mode = v
+	}
+	if v := os.Getenv("LOG_FORMAT"); v != "" {
+		cfg.Log.Format = v
+	}
+	if raw := os.Getenv("LOG_LEVEL"); raw != "" {
+		if lv, err := parseLevel("LOG_LEVEL", raw); err != nil {
+			errs = append(errs, err)
+		} else {
+			cfg.Log.Level = lv
+		}
 	}
 
 	errs = append(errs, cfg.validate()...)
@@ -104,4 +132,18 @@ func env(key, def string) string {
 		return v
 	}
 	return def
+}
+
+func parseLevel(where, raw string) (slog.Level, error) {
+	switch strings.ToLower(raw) {
+	case "debug":
+		return slog.LevelDebug, nil
+	case "info":
+		return slog.LevelInfo, nil
+	case "warn":
+		return slog.LevelWarn, nil
+	case "error":
+		return slog.LevelError, nil
+	}
+	return 0, fmt.Errorf("%s 只能是 debug/info/warn/error，当前值是 %q", where, raw)
 }
